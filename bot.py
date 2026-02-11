@@ -6,6 +6,21 @@ from datetime import datetime
 import random
 import os
 import sys
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+def run_health_server():
+    server = HTTPServer(("0.0.0.0", 8000), HealthHandler)
+    server.serve_forever()
+
+# Запускаем HTTP-сервер в фоне
+threading.Thread(target=run_health_server, daemon=True).start()
 
 TOKEN = "8423215399:AAGsRtMMJW8ZVJBgutOv8-JTJFFXPP0frko"
 URL = f"https://api.telegram.org/bot{TOKEN}/"
